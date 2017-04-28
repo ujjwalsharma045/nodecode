@@ -78,9 +78,14 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 var validator = require('validator');
-var multer = require('multer');
 
-var mailer = require('nodemailer');
+var multer = require('multer');
+app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "http://127.0.0.1:8081");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+});
+var mailer = require('nodemailer');  
   
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
@@ -93,13 +98,13 @@ var storage = multer.diskStorage({
 	}
 });
 
-var upload = multer({storage:storage}).single('myprofile');
+var upload = multer({storage:storage}).single('file');
 
 var func = require("./commonfunctions.js");
 
 var mail = require("./mailfunctions.js");
 
-var dateFormat = require('dateformat');
+var dateFormat = require('dateformat'); 
 
 var dateDiff = require('date-diff');
 var dobByAge = require('birth-by-age-at-date');

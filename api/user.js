@@ -1,6 +1,7 @@
 module.exports = function(app , func , mail, upload, storage, mailer, multer, validator, User, paginate , cors , dateFormat , dateDiff, dobByAge, json2csv, excel , pdf, passport , LocalStrategy){ 
+   
     var sess;
-    var session = require('express-session');
+    var session = require('express-session'); 
     var math = require('mathjs');  		
 	
 	app.get("/showusers" , function(req, res){
@@ -198,7 +199,7 @@ module.exports = function(app , func , mail, upload, storage, mailer, multer, va
 		}
 	});
 
-    app.post("/adduser" , upload , function(req , res){
+    app.post("/adduser" ,  function(req , res){
 		sess=req.session;
         var resp = func.isLoggedIn(sess);
 		if(!resp){
@@ -209,43 +210,55 @@ module.exports = function(app , func , mail, upload, storage, mailer, multer, va
 			var error = [];
 			var data = {};
 			if(req.method=="POST"){
-				 if(error.length<=0){	
-                   var currentdate = new Date();
-                   var formatteddate = dateFormat(currentdate ,'yyyy-mm-dd HH:MM:ss');				   
-					data = {
-						first_name:req.body.first_name,
-						last_name:req.body.last_name,
-						email:req.body.email,
-						username:req.body.username,
-						password:req.body.password,
-                        dateofbirth:req.body.dateofbirth,
-                        created_at :formatteddate 						
-					};
-					console.log(data);			   
-					var detail = new User(data);
-					detail.save(function(err){
-					   if(err) throw err;
-					   console.log('User saved successfully!');
-					   
-					   mailoptions = {
-						  to:data.email,
-						  subject: "User Registration",
-						  text:"User Registered successfully"
-					   };
-					   
-					   var mailObj = mail.configMail(mailer);
-					  
-					   mailObj.sendMail(mailoptions, function(error , response){
-						  if(error){
-							  console.log(error);
-						  }
-						  else {
-							  console.log(response.message); 
-						  }
-					   }); 
-					   res.setHeader('Content-Type', 'application/json');
-					   res.send(JSON.stringify({authen:1 , success:1})); 				   
-					});			   			    
+				 if(error.length<=0){                   
+				       upload(req, res, function(err){
+						  
+						   if(err){
+							  res.json({error_code:1,err_desc:err});
+							  return;
+						   }
+						
+                           //res.json({error_code:0,err_desc:null});
+                   				   
+                           var currentdate = new Date();
+                           var formatteddate = dateFormat(currentdate ,'yyyy-mm-dd HH:MM:ss');				   
+					       data = {
+						     first_name:req.body.first_name,
+						     last_name:req.body.last_name,
+						     email:req.body.email,
+						     username:req.body.username,
+						     password:req.body.password,
+							 profile_pic:req.file.filename,
+                             dateofbirth:req.body.dateofbirth,
+                             created_at :formatteddate 						
+					       };
+						
+					       console.log(data);			   
+					       var detail = new User(data);
+						   detail.save(function(err){
+						      if(err) throw err;
+						      console.log('User saved successfully!');
+						   
+							   mailoptions = {
+								  to:data.email,
+								  subject: "User Registration",
+								  text:"User Registered successfully"
+							   };
+						   
+							   var mailObj = mail.configMail(mailer);
+							  
+							   mailObj.sendMail(mailoptions, function(error , response){
+								  if(error){
+									  console.log(error);
+								  }
+								  else {
+									  console.log(response.message); 
+								  }
+							   }); 
+						       res.setHeader('Content-Type', 'application/json');
+						       res.send(JSON.stringify({authen:1 , success:1})); 				   
+						   });			   			    
+				       });
 				 } 
 			}
 			else {
@@ -285,9 +298,9 @@ module.exports = function(app , func , mail, upload, storage, mailer, multer, va
 							   };
 							   console.log(sess); 
 							   res.cookie('user' , user._id , detail);
-							   
+							   //console.log(res); 
 							   res.setHeader('Content-Type', 'application/json');
-							   res.send(JSON.stringify({success:1 , authen:0})); 				   
+							   res.send(JSON.stringify({success:1 , authen:1})); 				   
 						  }
 						  else {						  
 							   res.setHeader('Content-Type', 'application/json');

@@ -1,4 +1,4 @@
-app.controller('users' , function($scope , $http , $route , $routeParams ,$location , authen, localStorageService , dateTime , Users , pageTitle){
+app.controller('users' , ['$scope' , '$http' , '$route' , '$routeParams' ,'$location' , 'authen', 'localStorageService' , 'dateTime' , 'Users' , 'pageTitle', 'Upload', '$timeout', function($scope , $http , $route , $routeParams ,$location , authen, localStorageService , dateTime , Users , pageTitle, Upload, $timeout){
     	   
    var storageType = localStorageService.getStorageType(); 
    
@@ -6,15 +6,16 @@ app.controller('users' , function($scope , $http , $route , $routeParams ,$locat
       language: 'en',
       allowedContent: true,
       entities: false
-   };   
+   };  
+   
    $scope.onReady = function () {
     
-   };   
+   };
+   
    $scope.content = "";   
    $scope.timeformat = dateTime.showTime();     
    $scope.title = pageTitle;
-   
-   
+      
    if($route.current.type=="list"){
 	    Users.totalUsers($scope);
 		
@@ -145,21 +146,44 @@ app.controller('users' , function($scope , $http , $route , $routeParams ,$locat
 	   }
    }   
     
-   $scope.adduser = function(){
-	   	  	  
+   $scope.adduser = function(file){
 	  if(localStorageService.get('login')=="1"){     
-	    if($scope.userform.$valid){	   
-			
+	    if($scope.userform.$valid){
+            
             var data = {
                 first_name: $scope.user.first_name,
                 last_name: $scope.user.last_name,
                 email: $scope.user.email,
                 username: $scope.user.username,
                 password: $scope.user.password,
-                dateofbirth: $scope.user.dateofbirth                
+                dateofbirth: $scope.user.dateofbirth,
+                file:file                
 			};
+			
+			file.upload = Upload.upload({
+				  url:'http://127.0.0.1:8081/adduser',
+				  data:data
+            });
+
+			file.upload.then(
+			   function (response) {
+				  /* $timeout(function () {
+					file.result = response.data;
+				  });*/
+				  if(response.data['success']=='1'){
+						$location.path("/");
+				  }
+			   }, 
+			   function (response) {
+			        //if(response.status >0)
+				   //$scope.errorMsg = response.status + ': ' + response.data;
+			   }, 
+			   function (evt) {
+			      //Math.min is to fix IE which reports 200% sometimes
+			     //file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+			});		
                       
-			var req = {
+			   /*var req = {
 			    method: 'POST',
 			    url: 'http://127.0.0.1:8081/adduser',
 			    headers: {
@@ -170,15 +194,15 @@ app.controller('users' , function($scope , $http , $route , $routeParams ,$locat
 
             $http(req).then(
 			  function(response){
-                console.log(response);
-				if(response.data['success']=='1'){
+                    console.log(response);
+				    if(response.data['success']=='1'){
 						$location.path("/");
 					}
 			  },
 			  function(response){	      
 					
 			  }
-			);			
+			);*/			
 		}
 		else {
 		    $scope.submitted =true; 	
@@ -508,6 +532,6 @@ app.controller('users' , function($scope , $http , $route , $routeParams ,$locat
 			}										   	  	
 	   }); 	   	  
    }   
-});
+}]);
 
 
