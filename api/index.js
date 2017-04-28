@@ -89,7 +89,7 @@ var mailer = require('nodemailer');
   
 var storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, './uploads')
+		cb(null, './public/uploads')
 	},
 	filename: function (req, file, cb) {
 		var fileexploded = file.originalname.split(".");

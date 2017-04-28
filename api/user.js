@@ -158,31 +158,66 @@ module.exports = function(app , func , mail, upload, storage, mailer, multer, va
 				
 			if(req.method=="POST"){
 				if(error.length <=0){
-					  var currentdate = new Date();
-                      var formatteddate = dateFormat(currentdate ,'yyyy-mm-dd HH:MM:ss');
-					  data = {
-							first_name: req.body.first_name,
-							last_name:req.body.last_name,
-							address:req.body.address,
-							city:req.body.city,
-							state:req.body.state,
-							zipcode:req.body.zipcode,
-							dateofbirth:req.body.dateofbirth,
-							modified_at:formatteddate
-					  }; 
-					  console.log(data);
-					  User.findOneAndUpdate({ _id: userid }, data, function(err, records) {
-						  if (err) throw err;				 
-									 
-						  res.setHeader('Content-Type', 'application/json');
-						  res.send(JSON.stringify({authen:1 ,success:1}));
-					  });				  				  				  
-				 } 		 		 	
-			}
-            else {
-				 res.setHeader('Content-Type', 'application/json');
-				 res.send(JSON.stringify({authen:1 ,success:0}));
-			}			
+					upload(req, res, function(err){
+						 if(req.file){ 
+							   if(err){
+								  res.json({error_code:1,err_desc:err});
+								  return;
+							   }
+							   
+					           var currentdate = new Date();
+                               var formatteddate = dateFormat(currentdate ,'yyyy-mm-dd HH:MM:ss');
+					  
+							   data = {
+									first_name: req.body.first_name,
+									last_name:req.body.last_name,
+									address:req.body.address,
+									city:req.body.city,
+									state:req.body.state,
+									zipcode:req.body.zipcode,
+									dateofbirth:req.body.dateofbirth,
+									profile_pic:req.file.filename,
+									modified_at:formatteddate
+							   }; 
+					  
+							   console.log(data);
+							   User.findOneAndUpdate({_id: userid}, data, function(err, records) {
+								  if (err) throw err;				 
+											 
+								  res.setHeader('Content-Type', 'application/json');
+								  res.send(JSON.stringify({authen:1 ,success:1}));
+							  });
+						 }
+                         else {
+							   var currentdate = new Date();
+                               var formatteddate = dateFormat(currentdate ,'yyyy-mm-dd HH:MM:ss');
+					  
+							   data = {
+									first_name: req.body.first_name,
+									last_name:req.body.last_name,
+									address:req.body.address,
+									city:req.body.city,
+									state:req.body.state,
+									zipcode:req.body.zipcode,
+									dateofbirth:req.body.dateofbirth,	
+									modified_at:formatteddate
+							   }; 
+					  
+							   console.log(data);
+							   User.findOneAndUpdate({_id: userid}, data, function(err, records) {
+								  if (err) throw err;				 
+											 
+								  res.setHeader('Content-Type', 'application/json');
+								  res.send(JSON.stringify({authen:1 ,success:1}));
+							  });
+						  }						 
+				     }); 		 		 	
+			    }
+                else {
+				   res.setHeader('Content-Type', 'application/json');
+				   res.send(JSON.stringify({authen:1 ,success:0}));
+			    }			
+		    }
 		}
 	});
 	
@@ -211,33 +246,48 @@ module.exports = function(app , func , mail, upload, storage, mailer, multer, va
 			var data = {};
 			if(req.method=="POST"){
 				 if(error.length<=0){                   
-				       upload(req, res, function(err){
-						  
-						   if(err){
-							  res.json({error_code:1,err_desc:err});
-							  return;
-						   }
+				    upload(req, res, function(err){
+						 if(req.file){ 
+							   if(err){
+								  res.json({error_code:1,err_desc:err});
+								  return;
+							   }
 						
-                           //res.json({error_code:0,err_desc:null});
+                               //res.json({error_code:0,err_desc:null});
                    				   
-                           var currentdate = new Date();
-                           var formatteddate = dateFormat(currentdate ,'yyyy-mm-dd HH:MM:ss');				   
-					       data = {
-						     first_name:req.body.first_name,
-						     last_name:req.body.last_name,
-						     email:req.body.email,
-						     username:req.body.username,
-						     password:req.body.password,
-							 profile_pic:req.file.filename,
-                             dateofbirth:req.body.dateofbirth,
-                             created_at :formatteddate 						
-					       };
+                               var currentdate = new Date();
+                               var formatteddate = dateFormat(currentdate ,'yyyy-mm-dd HH:MM:ss');				   
+					           data = {
+									 first_name:req.body.first_name,
+									 last_name:req.body.last_name,
+									 email:req.body.email,
+									 username:req.body.username,
+									 password:req.body.password,
+									 profile_pic:req.file.filename,
+									 dateofbirth:req.body.dateofbirth,
+									 created_at :formatteddate 						
+					          };
+						 }
+						 else {
+                             var currentdate = new Date();
+                             var formatteddate = dateFormat(currentdate ,'yyyy-mm-dd HH:MM:ss');				   
+					         data = {
+								 first_name:req.body.first_name,
+								 last_name:req.body.last_name,
+								 email:req.body.email,
+								 username:req.body.username,
+								 password:req.body.password,
+								 profile_pic:'',
+								 dateofbirth:req.body.dateofbirth,
+								 created_at :formatteddate 						
+					        };
+                        }
 						
-					       console.log(data);			   
-					       var detail = new User(data);
-						   detail.save(function(err){
-						      if(err) throw err;
-						      console.log('User saved successfully!');
+					    console.log(data);			   
+						var detail = new User(data);
+						detail.save(function(err){
+							  if(err) throw err;
+							  console.log('User saved successfully!');
 						   
 							   mailoptions = {
 								  to:data.email,
@@ -255,10 +305,10 @@ module.exports = function(app , func , mail, upload, storage, mailer, multer, va
 									  console.log(response.message); 
 								  }
 							   }); 
-						       res.setHeader('Content-Type', 'application/json');
-						       res.send(JSON.stringify({authen:1 , success:1})); 				   
-						   });			   			    
-				       });
+							   res.setHeader('Content-Type', 'application/json');
+							   res.send(JSON.stringify({authen:1 , success:1})); 				   
+						});			   			    
+				    });
 				 } 
 			}
 			else {
@@ -319,7 +369,6 @@ module.exports = function(app , func , mail, upload, storage, mailer, multer, va
 			}		
 		}
 	});
-
 
     /*app.post("/login" ,  function(req , res, next){
         sess = req.session;       

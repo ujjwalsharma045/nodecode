@@ -14,24 +14,7 @@
 			     <input type="text" name="firstname" ng-model="user.first_name" required>
 				 <p ng-show="submitted && userform.firstname.$invalid">Enter First Name</p>
 			  </td>		  
-		  </tr>
-		  
-		  <tr>
-		    <td>Image</td>	
-		    <td>
-		       <input type="file" ngf-select ng-model="picFile" name="file"    
-             accept="image/*" ngf-max-size="2MB" required
-             ngf-model-invalid="errorFile">
-			   <p ng-show="submitted && userform.file.$error.required">
-			      Select File
-			   </p>
-			   <p ng-show="submitted && userform.file.$error.maxSize">
-			     File too large 
-                 {{errorFile.size / 1000000|number:1}}MB: max 2M
-			   </p>                           
-              <img ng-show="userform.file.$valid" ngf-thumbnail="picFile" class="thumb"> <button ng-click="picFile = null" ng-show="picFile">Remove</button>
-	        </td>
-		  </tr>
+		  </tr>		  		  
 		  
 		  <tr>
 			  <td>Last Name</td>		  
@@ -64,6 +47,22 @@
 				 <input type="password" name="password" ng-model="user.password" required>
 				 <p ng-show="submitted && userform.password.$invalid">Enter Password</p>				 
 			  </td>		  
+		  </tr>
+		  
+		  <tr>
+		    <td>Image</td>	
+		    <td>
+		       <input type="file" ngf-select ng-model="picFile" name="file"    
+             accept="image/*" ngf-max-size="2MB">
+			   <!-- <p ng-show="submitted && userform.file.$error.required">
+			      Select File
+			   </p>
+			   <p ng-show="submitted && userform.file.$error.maxSize">
+			     File too large 
+                 {{errorFile.size / 1000000|number:1}}MB: max 2M
+			   </p> -->                           
+              <img ng-show="userform.file.$valid" ngf-thumbnail="picFile" class="thumb"> <button ng-click="picFile = null" ng-show="picFile">Remove</button>
+	        </td>
 		  </tr>
           
           <tr>
